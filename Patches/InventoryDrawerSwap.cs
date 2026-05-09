@@ -78,7 +78,7 @@ namespace CloverAddictivePatches.Patches
             foreach (int i in drawersWithItems)
             {
                 PowerupScript drawerPowerup = PowerupScript.GetDrawerPowerup(i);
-                string itemName = drawerPowerup.NameGet(false, false);
+                string itemName = drawerPowerup.NameGet(false, false, false);
 
                 newOptions[currentIndex] = $"Swap with {itemName}";
                 newEvents[currentIndex] = new ScreenMenuScript.OptionEvent(() => SwapWithDrawer(i));
