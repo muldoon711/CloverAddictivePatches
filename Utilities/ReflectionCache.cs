@@ -203,7 +203,9 @@ namespace CloverAddictivePatches.Utilities
 
             internal static void Initialize()
             {
-                var settingsType = typeof(Data).GetField("settings")?.FieldType;
+                // settings became a property in the 2026 update; try both field and property
+                var settingsType = typeof(Data).GetField("settings")?.FieldType
+                    ?? typeof(Data).GetProperty("settings")?.PropertyType;
                 if (settingsType != null)
                 {
                     flashingLightsReducedEnabled = AccessTools.Field(settingsType, "flashingLightsReducedEnabled");

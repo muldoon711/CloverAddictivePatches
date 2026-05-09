@@ -10,7 +10,7 @@ namespace CloverAddictivePatches
     [BepInPlugin("io.github.failspy.qualityclover", "CloverAddictivePatches", Plugin.Version)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string Version = "1.0.6";
+        public const string Version = "1.0.7";
 
         public static Plugin Instance { get; private set; }
 
@@ -246,7 +246,7 @@ namespace CloverAddictivePatches
                 "Quality of Life",
                 "MainMenuAdditionsPatch",
                 true,
-                "Add Flashing Lights Reduction toggle to accessibility menu and in-game mod configuration menu");
+                "Add FOV option to accessibility menu and in-game mod configuration menu (Flashing Lights is now a native game setting)");
 
             MemoryCardMenuAccessPatch = Config.Bind(
                 "Quality of Life",

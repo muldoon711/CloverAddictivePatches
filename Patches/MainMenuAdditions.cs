@@ -234,33 +234,27 @@ namespace CloverAddictivePatches.Patches
             var menuElements = (DiegeticMenuElement[])menuElementsField.GetValue(__instance);
             var menuController = (DiegeticMenuController)menuControllerField.GetValue(__instance);
 
-            string vanillaBackText = optionTexts != null && optionTexts.Length > 4 ? optionTexts[4].text : "Back";
+            // Game update added MFunc_ReducedFlashing natively: FlashingLights is now vanilla at
+            // controller index 4, so Back moved from optionTexts[4] to optionTexts[5].
+            // FOV slot shifted from prefab element[5] to element[6].
+            string vanillaBackText = optionTexts != null && optionTexts.Length > 5 ? optionTexts[5].text : "Back";
 
             if (menuElements != null && menuElements.Length > 6)
             {
                 if (Plugin.FOVAdjustmentPatch.Value)
                 {
-                    for (int i = 5; i <= 6; i++)
+                    // Game handles element[5] (FlashingLights) natively; only add element[6] for FOV.
+                    var fovElement = menuElements[6];
+                    fovElement.transform.parent.gameObject.SetActive(true);
+                    if (!menuController.elements.Contains(fovElement))
                     {
-                        var element = menuElements[i];
-                        element.transform.parent.gameObject.SetActive(true);
-                        if (!menuController.elements.Contains(element))
-                        {
-                            menuController.elements.Add(element);
-                            element.SetMyController(menuController);
-                        }
+                        menuController.elements.Add(fovElement);
+                        fovElement.SetMyController(menuController);
                     }
                 }
                 else
                 {
-                    var element5 = menuElements[5];
-                    element5.transform.parent.gameObject.SetActive(true);
-                    if (!menuController.elements.Contains(element5))
-                    {
-                        menuController.elements.Add(element5);
-                        element5.SetMyController(menuController);
-                    }
-
+                    // FOV disabled: ensure element[6] is hidden and removed from controller.
                     var element6 = menuElements[6];
                     if (menuController.elements.Contains(element6))
                     {
@@ -270,25 +264,9 @@ namespace CloverAddictivePatches.Patches
                 }
             }
 
+            // Game now writes FlashingLights text to optionTexts[4] natively; don't overwrite it.
             if (optionTexts != null && optionTexts.Length > 6)
             {
-                string flashingLightsText = "Flashing Reduction: OFF";
-                if (Data.settings != null)
-                {
-                    var flashingLightsField = Data.settings.GetType().GetField("flashingLightsReducedEnabled");
-                    bool flashingLightsEnabled = (bool)(flashingLightsField?.GetValue(Data.settings) ?? false);
-
-                    var translationType = typeof(MainMenuScript).Assembly.GetType("Panik.Translation");
-                    var translationGetMethod = translationType?.GetMethod("Get", new Type[] { typeof(string) });
-
-                    string flashingKey = flashingLightsEnabled
-                        ? "MENU_OPTION_SETTINGS_ACCESSIBILITY_FLASHING_LIGHTS_ON"
-                        : "MENU_OPTION_SETTINGS_ACCESSIBILITY_FLASHING_LIGHTS_OFF";
-                    flashingLightsText = (string)translationGetMethod?.Invoke(null, new object[] { flashingKey });
-                }
-
-                optionTexts[4].text = flashingLightsText;
-
                 if (Plugin.FOVAdjustmentPatch.Value)
                 {
                     int currentFOV = Mathf.RoundToInt(Plugin.PlayerFOV.Value);
@@ -300,10 +278,7 @@ namespace CloverAddictivePatches.Patches
                     optionTexts[5].text = fovText;
                     optionTexts[6].text = vanillaBackText;
                 }
-                else
-                {
-                    optionTexts[5].text = vanillaBackText;
-                }
+                // FOV disabled: game already has correct text at [4]=FlashingLights, [5]=Back.
             }
         }
 
@@ -406,24 +381,19 @@ namespace CloverAddictivePatches.Patches
             // Handle Accessibility menu
             if (_menuIndex == MainMenuScript.MenuIndex.settingsAccessiblity)
             {
-                // Index mapping depends on FOV Adjustment setting:
+                // Game update added MFunc_ReducedFlashing natively, so index layout is now:
+                // 0: Language        (vanilla)
+                // 1: Text Effects    (vanilla)
+                // 2: Screen Shake   (vanilla)
+                // 3: Wobbly Polygons (vanilla)
+                // 4: Flashing Lights (vanilla, handled by MFunc_ReducedFlashing — do not intercept)
                 // When FOV Adjustment is ON:
-                //   0-3: Vanilla options (Language, Text Effects, Screen Shake, Wobbly Polygons)
-                //   4: Flashing Lights (NEW)
-                //   5: FOV (NEW)
-                //   6: Back (shifted)
+                //   5: FOV (mod)
+                //   6: Back visual hint (mod, navigation via back-input)
                 // When FOV Adjustment is OFF:
-                //   0-3: Vanilla options
-                //   4: Flashing Lights (NEW)
-                //   5: Back (shifted)
+                //   (no additional mod elements; back via game's back-input)
 
-                if (selectionIndex == 4)
-                {
-                    // Flashing Lights clicked - toggle the setting
-                    MFunc_FlashingLights(__instance, true);
-                    return false;  // Skip original
-                }
-                else if (selectionIndex == 5)
+                if (selectionIndex == 5)
                 {
                     if (Plugin.FOVAdjustmentPatch.Value)
                     {
@@ -445,7 +415,7 @@ namespace CloverAddictivePatches.Patches
                     return false;  // Skip original
                 }
 
-                // Let original handle 0-3 (Language, Text Effects, Screen Shake, Wobbly Polygons)
+                // Let original handle 0-4 (Language, Text Effects, Screen Shake, Wobbly Polygons, Flashing Lights)
                 return true;
             }
 

@@ -2,6 +2,26 @@
 
 A collection of many toggleable quality-of-life improvements for CloverPit. Tweak FOV, skip repetitive dialogues, peek into drawers, and smooth out rough edges.
 
+## Changelog
+
+### v1.0.7 — Game Update Compatibility Fix (2026 update)
+
+This release restores compatibility after the CloverPit 2026 update.
+
+**What changed in the game:**
+
+- `MainMenuScript` gained `MFunc_ReducedFlashing` — Flashing Lights Reduction is now a native game setting. The accessibility menu gained a new element at index 4, shifting all subsequent mod-injected elements up by one.
+- `Data.settings` changed from a public field to a property.
+- `GameplayMaster.DeathStep` enum gained a new `startFalling` value between `lookAtTrapdoor` and `falling`.
+- `GameplayMaster.InterestsAndTicketsPhase` enum gained a new `beforeInterestsAndClovers` value.
+
+**Fixes applied:**
+
+1. **`Patches/MainMenuAdditions.cs` — Accessibility menu index shift**: The mod previously injected a Flashing Lights toggle at index 4 and a FOV option at index 5. The game now handles Flashing Lights natively at index 4. Updated `SetFlashingLightsText` to read Back text from `optionTexts[5]` (was `[4]`), add the FOV element at index 6 (was 5), and write text accordingly. Removed the mod's Flashing Lights element injection entirely.
+2. **`Patches/MainMenuAdditions.cs` — `InterceptMenuSelection` accessibility section**: Removed the index 4 intercept for Flashing Lights (now handled natively by `MFunc_ReducedFlashing`). Updated indices 5 and 6 for FOV and Back respectively.
+3. **`Utilities/ReflectionCache.cs` — `Data.settings` field→property**: `DataCache.Initialize()` now falls back to `GetProperty` when `GetField("settings")` returns null, maintaining compatibility across both old and new game versions.
+4. **`Plugin.cs`**: Bumped version to 1.0.7; updated `MainMenuAdditionsPatch` config description to reflect that Flashing Lights is now a native game setting.
+
 ## What's Included
 
 ### Camera & FOV
