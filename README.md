@@ -112,15 +112,4 @@ CLOVERPIT_DIR="/path/to/CloverPit" ./compile.sh
 
 ## Changelog
 
-### v1.0.7 — 2026 Game Update Compatibility
-
-Restored compatibility after the CloverPit 2026 update.
-
-- Fixed accessibility menu layout: game now provides Flashing Lights natively (shifted mod-injected FOV option from index 5 to 6)
-- Fixed `Data.settings` access: game changed it from a field to a property
-- Fixed `PowerupScript.NameGet()`: gained a third `sanitize` parameter in the update
-- Version bump 1.0.6 → 1.0.7
-
-### v1.0.6 and earlier
-
-See [commit history](https://github.com/muldoon711/CloverAddictivePatches/commits/main).
+See [CHANGELOG.md](CHANGELOG.md) for the full version history.
